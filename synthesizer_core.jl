@@ -6,7 +6,7 @@ mutable struct harmonicTemplate
     #in seconds
     attack::Float64;
     decay::Float64;
-    sustain::Float64; 
+    sustain::Float64; #in decibels (dB) 
     release::Float64;
     #relative amplitudes
     #vector of 16 values harmonicAmplitudes[harmonic] gives the amplitude of harmonic,
@@ -34,9 +34,15 @@ end
 
 
 #synthesize function, used to perform synthesize on a particular harmonic template
+
+#TODO: need to implement envelope into this. 
+#attack is how long it goes from silence to original sound
 function synthesize(f::Number, S::Number, N::Number, ht::harmonicTemplate)
     harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
     synthesizedWaveform = cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
     return synthesizedWaveform;
 end
+
+#TODO: Need continuous synthesize function where it will continously give out sound when a key is continously pressed
+
 
