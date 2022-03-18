@@ -15,14 +15,14 @@ sharp = GtkCssProvider(data="#wb {color:white; background:black;}")
 for i in 1:size(white,1)
     key = white[i]
     b = GtkButton(key)
-    keyGrid[(1:2) .+ 2*(i-1), (1:2)] = b
+    keyGrid[(1:2) .+ 2*(i-1), 2] = b
 end
 for i in 1:size(black,1)
     key, start = black[i,1:2]
     c = GtkButton(key * "♯")
     push!(GAccessor.style_context(c), GtkStyleProvider(sharp),600)
     set_gtk_property!(c, :name, "wb")
-    keyGrid[2*(i-1), 1] = c
+    keyGrid[start .+ (0:1), 1] = c
 end
 push!(window, keyGrid)
 showall(window);
