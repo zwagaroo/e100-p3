@@ -6,7 +6,7 @@ mutable struct harmonicTemplate
     #in seconds
     attack::Float64;
     decay::Float64;
-    sustain::Float64; #in decibels (dB) 
+    sustain::Float64; #in decibels (dB) sustain must be a negative number as it's relative to peak gain
     release::Float64;
     #relative amplitudes
     #vector of 16 values harmonicAmplitudes[harmonic] gives the amplitude of harmonic,
@@ -28,6 +28,7 @@ function readHarmonicTemplates(filePath::String)::Dict{String, harmonicTemplate}
 end
 
 
+
 function getAmplitude(ht::harmonicTemplate, harmonicNumber::Int)::Float64
     return ht.harmonicAmplitudes[harmonicNumber];
 end
@@ -37,12 +38,38 @@ end
 
 #TODO: need to implement envelope into this. 
 #attack is how long it goes from silence to original sound
+#N is length not including the release(the release is like extra after the note ended)
 function synthesize(f::Number, S::Number, N::Number, ht::harmonicTemplate)
+    attackSamples = ht.attack*S;
+    decaySamples = ht.decay*S;
+    sustain = ht.sustain;
+    releaseSamples = ht.release*S;
     harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
-    synthesizedWaveform = cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
-    return synthesizedWaveform;
+    synthesizedWaveform = vec(cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    releaseWaveform = vec(cos.(2π* (N+1:N+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    #envelope generator downhere
+    peakVolume = 1;
+    sustainVolume = peakVolume * 10^(sustain);
+    releaseVolume = 0;
+    for i in range(1, size(synthesizedWaveform,1))
+        if(i <= attackSamples) #within the range of attack portion
+            synthesizedWaveform[i] = synthesizedWaveform[i] * (i/attackSamples)*peakVolume;
+            releaseVolume = (i/attackSamples)*peakVolume;
+        elseif(i > attackSamples && i <= attackSamples+decaySamples)
+            synthesizedWaveform[i] = synthesizedWaveform[i] * peakVolume * 10^(sustain*(i-attackSamples)/decaySamples);
+            releaseVolume = peakVolume * 10^(sustain*(i-attackSamples)/decaySamples);
+        elseif(i > attackSamples+decaySamples)
+            synthesizedWaveform[i] = synthesizedWaveform[i] * sustainVolume;
+            releaseVolume = sustainVolume;
+        end
+    end
+    for i in range(1,size(releaseWaveform, 1))
+        releaseWaveform[i] = releaseWaveform[i] * releaseVolume * (1- i/releaseSamples);
+    end
+    return synthesizedWaveform, releaseWaveform;
 end
+#while new data is coming in, checking if they stopped pressing, i.e. no data is coming through
+#check where we are on the envelope
+#
 
 #TODO: Need continuous synthesize function where it will continously give out sound when a key is continously pressed
-
-
