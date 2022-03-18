@@ -15,6 +15,14 @@ mutable struct harmonicTemplate
     harmonicTemplate(a,d,s,r,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16) = new(a,d,s,r, [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16]);
 end
 
+function harmonicTemplate(a,d,s,r, harmonicAmplitudes)
+    ht = harmonicTemplate(a,d,s,r);
+    for i in range(1,size(harmonicAmplitudes,1))
+        ht.harmonicAmplitudes[i] = harmonicAmplitudes[i];
+    end
+    return ht;
+end
+
 #reads a file where we store harmonic templates and construct the corresponding harmonic template
 #ultimately returns a dict that represents harmonic templates
 function readHarmonicTemplates(filePath::String)::Dict{String, harmonicTemplate}
@@ -24,6 +32,25 @@ function readHarmonicTemplates(filePath::String)::Dict{String, harmonicTemplate}
         htTemp = harmonicTemplate(row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16],row[17],row[18],row[19],row[20],row[21]);
         merge!(htDict, Dict{String, harmonicTemplate}(row[1] => htTemp));
     end
+    return htDict;
+end
+
+function writeHarmonicTemplates(filePath::String, htDict::Dict{String, harmonicTemplate})
+    #clear file
+    io = open("harmonicTemplates.txt", "w");
+    write(io, "");
+    close(io);
+    #rewrite our harmonic templates
+    io = open("harmonicTemplates.txt", "a");
+    for key in keys(htDict)
+        htTemp = htDict[key];
+        write(io, key, ",", string(htTemp.attack), ",", string(htTemp.decay), ",", string(htTemp.sustain), ",", string(htTemp.release), ",");
+        for harmonicAmplitude in htTemp.harmonicAmplitudes
+            write(io, string(harmonicAmplitude), ",");
+        end
+        write(io,'\n');
+    end
+    close(io);
     return htDict;
 end
 
@@ -48,7 +75,7 @@ function synthesize(f::Number, S::Number, N::Number, ht::harmonicTemplate)
     synthesizedWaveform = vec(cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     releaseWaveform = vec(cos.(2π* (N+1:N+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     #envelope generator downhere
-    peakVolume = 1;
+    peakVolume = 30; #default
     sustainVolume = peakVolume * 10^(sustain);
     releaseVolume = 0;
     for i in range(1, size(synthesizedWaveform,1))
@@ -64,7 +91,7 @@ function synthesize(f::Number, S::Number, N::Number, ht::harmonicTemplate)
         end
     end
     for i in range(1,size(releaseWaveform, 1))
-        releaseWaveform[i] = releaseWaveform[i] * releaseVolume * (1- i/releaseSamples);
+        releaseWaveform[i] = releaseWaveform[i] * releaseVolume * (1.0- i/releaseSamples);
     end
     return synthesizedWaveform, releaseWaveform;
 end
