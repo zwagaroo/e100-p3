@@ -1,5 +1,5 @@
 using Gtk
-
+#add button that connects 
 window = GtkWindow("Synthesizer", 1600, 1200) # 1600x1200 window for the GUI
 keyGrid = GtkGrid()
 set_gtk_property!(keyGrid, :row_spacing, 5)
