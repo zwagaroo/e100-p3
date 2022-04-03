@@ -11,8 +11,11 @@ mutable struct harmonicTemplate
     #relative amplitudes
     #vector of 16 values harmonicAmplitudes[harmonic] gives the amplitude of harmonic,
     harmonicAmplitudes::Vector{Float64};
-    harmonicTemplate(a,d,s,r) = new(a,d,s,r, Vector{Float64}([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]));
-    harmonicTemplate(a,d,s,r,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16) = new(a,d,s,r, [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16]);
+    harmonicTemplate(a,d,s,r) = new(a,d,s,r, 
+        Vector{Float64}([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]));
+
+    harmonicTemplate(a,d,s,r,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16) = 
+        new(a,d,s,r, [a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16]);
 end
 
 function harmonicTemplate(a,d,s,r, harmonicAmplitudes)
@@ -75,7 +78,7 @@ function synthesize(f::Number, S::Number, N::Number, ht::harmonicTemplate)
     synthesizedWaveform = vec(cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     releaseWaveform = vec(cos.(2π* (N+1:N+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     #envelope generator downhere
-    peakVolume = 30; #default
+    peakVolume = 1; #default
     sustainVolume = peakVolume * 10^(sustain);
     releaseVolume = 0;
     for i in range(1, size(synthesizedWaveform,1))
@@ -100,3 +103,43 @@ end
 #
 
 #TODO: Need continuous synthesize function where it will continously give out sound when a key is continously pressed
+
+#Sound file full synthesize function
+
+#need to remember to increment current_length outside of this function!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#Let me know if we should do it in the function
+function synthesize(ht::harmonicTemplate, f::Number, S::Number, current_length::Number)
+    T = 1/f;
+    numPeriodSamples = round(Int, T*S);
+    print(numPeriodSamples)
+    attackSamples = ht.attack*S;
+    decaySamples = ht.decay*S;
+    sustain = ht.sustain;
+    harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
+    periodWaveform = vec(cos.(2π * (current_length:current_length+numPeriodSamples*200) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    peakVolume = 1; #default
+    sustainVolume = peakVolume * 10^(sustain);
+    releaseVolume = 0;
+    for i in range(1, size(periodWaveform,1))
+        if(current_length+i <= attackSamples) #within the range of attack portion
+            periodWaveform[i] = periodWaveform[i] * (i/attackSamples)*peakVolume;
+            releaseVolume = (i/attackSamples)*peakVolume;
+        elseif((current_length+i) > attackSamples && (current_length+i) <= attackSamples+decaySamples)
+            periodWaveform[i] = periodWaveform[i] * peakVolume * 10^(sustain*(i-attackSamples)/decaySamples);
+            releaseVolume = peakVolume * 10^(sustain*(i-attackSamples)/decaySamples);
+        elseif((current_length+i) > attackSamples+decaySamples)
+            periodWaveform[i] = periodWaveform[i] * sustainVolume;
+            releaseVolume = sustainVolume;
+        end
+    end
+    return periodWaveform, releaseVolume;
+end
+
+function synthesize_release(releaseVolume::Number, ht::harmonicTemplate, current_length)
+    releaseSamples = ht.release*S;
+    releaseWaveform = vec(cos.(2π* (current_length:current_length+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    for i in range(1,size(releaseWaveform, 1))
+        releaseWaveform[i] = releaseWaveform[i] * releaseVolume * (1.0- i/releaseSamples);
+    end
+    return releaseWaveform;
+end
