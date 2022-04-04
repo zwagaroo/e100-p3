@@ -25,6 +25,8 @@ e1 = findall(==(0), vec(c1))
 f1 = [0; e1[1:end-1]]
 
 
+
+
 #call user inputted filename (might be better to move into gui)
  
 
