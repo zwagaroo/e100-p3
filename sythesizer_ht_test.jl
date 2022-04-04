@@ -3,16 +3,18 @@ using Sound;
 using PortAudio;
 htDict = readHarmonicTemplates("harmonicTemplates.txt")
 ht = htDict["Saw16"]
-out_stream = PortAudioStream(1, 1);
+S = 44100
+out_stream = PortAudioStream(0, 2; samplerate=Float64(S))
 
 
 synthesizedWaveForm, releaseWaveform = synthesize(440, 44100, 4*44100, ht);
 
 waveform = [synthesizedWaveForm; releaseWaveform];
 
-PortAudioStream(0, 2; samplerate=Float64(S)) do stream
-    write(stream, waveform)
-end
+#= soundsc(waveform, 44100) =#
+
+y = waveform / maximum(abs, waveform)
+write(out_stream, y)
 
 
 #=  =#

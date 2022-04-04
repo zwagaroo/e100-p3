@@ -1,4 +1,5 @@
 using DelimitedFiles;
+using Plots;
 #harmonic template struct
 #mutable so we can change it, just to hold data
 
@@ -74,9 +75,15 @@ function synthesize(f::Number, S::Number, N::Number, ht::harmonicTemplate)
     decaySamples = ht.decay*S;
     sustain = ht.sustain;
     releaseSamples = ht.release*S;
-    harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
-    synthesizedWaveform = vec(cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
-    releaseWaveform = vec(cos.(2π* (N+1:N+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    harmonicFreqs::Vector{Number} = f* range(1,16);
+    synthesizedWaveform = cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
+    synthesizedWaveform = synthesizedWaveform .- sum(synthesizedWaveform)/N;
+#=     @show extrema(synthesizedWaveform);
+    @show typeof(synthesizedWaveform)
+    plot(synthesizedWaveform)
+    gui()
+    throw("hello") =#
+    releaseWaveform = cos.(2π* (N+1:N+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
     #envelope generator downhere
     peakVolume = 1; #default
     sustainVolume = peakVolume * 10^(sustain);
@@ -116,6 +123,8 @@ function synthesize_period(f::Number, S::Number, current_length::Number, ht::har
     sustain = ht.sustain;
     harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
     periodWaveform = vec(cos.(2π * (current_length+1:current_length+numPeriodSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    #must normalize before applying harmonic
+    periodWaveform = periodWaveform / maximum(abs, periodWaveform)
     peakVolume = 1; #default
     sustainVolume = peakVolume * 10^(sustain);
     releaseVolume = 0;
@@ -137,7 +146,8 @@ end
 function synthesize_release(releaseVolume::Number, ht::harmonicTemplate, f::Number, S::Number, current_length::Number)
     harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
     releaseSamples = ht.release*S;
-    releaseWaveform = vec(cos.(2π* (current_length:current_length+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    releaseWaveform = vec(cos.(2π* (current_length+1:current_length+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    releaseWaveform = releaseWaveform / maximum(abs, releaseWaveform)
     for i in range(1,size(releaseWaveform, 1))
         releaseWaveform[i] = releaseWaveform[i] * releaseVolume * (1.0- i/releaseSamples);
     end
