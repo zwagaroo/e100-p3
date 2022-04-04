@@ -1,31 +1,33 @@
 include("synthesizer_core.jl");
 using Sound 
+using PortAudio
 htDict = readHarmonicTemplates("harmonicTemplates.txt");
-ht = htDict["A"];
+ht = htDict["Saw16"];
 current_length = 0;
 releaseVolume = 0; 
+out_stream = PortAudioStream(0, 2)
 
-while current_length < 16384
+function sound(x::AbstractMatrix, S::Real = framerate(x))
+    if size(x,1) == 1 # row "vector"
+        x = vec(x) # convenience
+    end
+    size(x,2) ≤ 2 || throw("size(x,2) = $(size(x,2)) is too many channels")
+    PortAudioStream(0, 2; samplerate=Float64(S)) do stream
+        write(stream, x)
+    end
+end
+
+S = 44100
+stream = PortAudioStream(0, 2; samplerate=Float64(S)) 
+while current_length < 4*S
     global current_length
     global releaseVolume;
     # print(current_length)
-    periodWaveform, releaseVolume = synthesize(ht, 440, 8192, current_length);
-    soundsc(periodWaveform, 8192);
-    current_length =current_length + round(Int, (1/440)*8192)*200 
-    println(current_length)
+    periodWaveform, releaseVolume = synthesize_period(440, 44100, current_length, ht);
+    current_length = current_length + round(Int, (1/440)*44100) 
+
+    write(stream, periodWaveform)
     # if current_length >= 16384
     #     break
     # end
 end
-
-# while(current_length < 16384)
-#     global current_length;
-#     global releaseVolume;
-#     print(current_length)
-#     periodWaveform, releaseVolume = synthesize(ht, 440, 8192, current_length);
-#     soundsc(periodWaveform, 8192);
-#     current_length =current_length + round(Int, 1/440*8192) 
-#     println(current_length)
-# end
-releaseWaveform = synthesize_release(releaseVolume,ht,current_length);
-write(out_stream, releaseWaveform);

@@ -108,25 +108,24 @@ end
 
 #need to remember to increment current_length outside of this function!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #Let me know if we should do it in the function
-function synthesize(ht::harmonicTemplate, f::Number, S::Number, current_length::Number)
+function synthesize_period(f::Number, S::Number, current_length::Number, ht::harmonicTemplate)
     T = 1/f;
     numPeriodSamples = round(Int, T*S);
-    print(numPeriodSamples)
     attackSamples = ht.attack*S;
     decaySamples = ht.decay*S;
     sustain = ht.sustain;
     harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
-    periodWaveform = vec(cos.(2π * (current_length:current_length+numPeriodSamples*200) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    periodWaveform = vec(cos.(2π * (current_length+1:current_length+numPeriodSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     peakVolume = 1; #default
     sustainVolume = peakVolume * 10^(sustain);
     releaseVolume = 0;
     for i in range(1, size(periodWaveform,1))
         if(current_length+i <= attackSamples) #within the range of attack portion
-            periodWaveform[i] = periodWaveform[i] * (i/attackSamples)*peakVolume;
+            periodWaveform[i] = periodWaveform[i] * ((i+current_length)/attackSamples)*peakVolume;
             releaseVolume = (i/attackSamples)*peakVolume;
         elseif((current_length+i) > attackSamples && (current_length+i) <= attackSamples+decaySamples)
-            periodWaveform[i] = periodWaveform[i] * peakVolume * 10^(sustain*(i-attackSamples)/decaySamples);
-            releaseVolume = peakVolume * 10^(sustain*(i-attackSamples)/decaySamples);
+            periodWaveform[i] = periodWaveform[i] * peakVolume * 10^(sustain*((i+current_length)-attackSamples)/decaySamples);
+            releaseVolume = peakVolume * 10^(sustain*((i+current_length)-attackSamples)/decaySamples);
         elseif((current_length+i) > attackSamples+decaySamples)
             periodWaveform[i] = periodWaveform[i] * sustainVolume;
             releaseVolume = sustainVolume;
@@ -135,7 +134,8 @@ function synthesize(ht::harmonicTemplate, f::Number, S::Number, current_length::
     return periodWaveform, releaseVolume;
 end
 
-function synthesize_release(releaseVolume::Number, ht::harmonicTemplate, current_length)
+function synthesize_release(releaseVolume::Number, ht::harmonicTemplate, f::Number, S::Number, current_length::Number)
+    harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
     releaseSamples = ht.release*S;
     releaseWaveform = vec(cos.(2π* (current_length:current_length+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     for i in range(1,size(releaseWaveform, 1))

@@ -64,8 +64,8 @@ function octave_shift(
     fmin::Number = 0Hz,
     fmax::Number = 4000Hz,
     # undocumented options below here that are unlikely to be modified
-    in_stream = PortAudioStream(1, 0), # default input device
-    out_stream = PortAudioStream(0, 1), # default output device
+    in_stream = PortAudioStream(2, 0), # default input device
+    out_stream = PortAudioStream(0, 2), # default output device
     buf::AbstractArray = read(in_stream, N), # warm-up
     fs = Float32[float(f) for f in domain(fft(buf)[fmin..fmax])],
     Niters::Int = ceil(Int, seconds * in_stream.sample_rate / N),
