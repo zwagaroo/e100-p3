@@ -76,17 +76,26 @@ print(phone_tone_transcriber(x, 8192))=#
 #this function finds the fundamental frequency of a small quasi periodic waveform
 function autocorrelate(waveform, S::Number)
     autocorr = real(ifft(abs2.(fft([waveform; zeros(length(waveform))])))) / sum(abs2, waveform);
+    #autocorr mirrors
+    autocorr[(length(autocorr)÷2+2):end] .= 0; 
     peak2start = nothing;
     checker = .96;
     peaks = [];
     while(peak2start === nothing)
         checker = checker - .01;
+        #if our checker goes below zero than clearly there is nothing here
+        if(checker <= .8 )
+            return nothing
+        end
         peaks = autocorr .> checker;
         peaks[1:findfirst(==(false), peaks)] .= false;
         #check if there is any true
         peak2start = findfirst(==(true), peaks);
     end
     peak2end = findnext(==(false), peaks, peak2start);
+    if(peak2end === nothing)
+        return nothing;
+    end
     peaks[peak2end:end] .= false;
     #= m = argmax(peaks .* autocorr)-1; =# 
 #=     peaks = peaks.*autocorr; =#
@@ -99,7 +108,8 @@ function autocorrelate(waveform, S::Number)
     end
     m /= discreteIntegral;
     m -= 1; =#
-    m = ((peak2start + peak2end -1) /2) -1;
+    #= m = ((peak2start + peak2end -1) /2) -1; =#
+    m = argmax(peaks .* autocorr) -1;
     return S/m;
 end
 
@@ -109,21 +119,33 @@ end
 #this function groups anything within 50 cents to one frequency 
 #at the average of of all frequencies that are within 50 cents.
 function frequency_grouper(frequencies) 
+    println(frequencies);
+    println(size(frequencies,1));
     noteList = []; 
     current_frequency = frequencies[1];
     current_counter = 0;
     for i in range(1, size(frequencies,1))
+        #if frequency is less than or more than 50 cents from the original
+        #frequencies of nothing results from changing notes where autocorr fails
+        #thus we assume that during the note change, the last note is around still running here
+        #this may cause an error of around .07 seconds. Though it's non trivial, but not significant enough
+        if( frequencies[i] === nothing)
+            current_counter +=1;
+            #cannot check anything else for this one so we just continue
+            continue;
+        end
         if ((frequencies[i] < current_frequency*2^(1/24)) && (frequencies[i] > current_frequency*2^(-1/24)))
             current_counter += 1;
         else
-            print("ya")
-            note = (current_frequency, current_counter);
+            note = (current_frequency, current_counter *3000);
             push!(noteList, note);
-            current_counter = 0;
+            current_counter = 1;
             current_frequency = frequencies[i];
         end
+
     end
-    note = (current_frequency, current_counter);
+    #push final note out
+    note = (current_frequency, current_counter*3000);
     push!(noteList, note);
     return noteList;
 end
@@ -146,6 +168,7 @@ function transcribe(audioFile, S::Number)
             frequencies = [frequencies; frequencies[end]];
         else
             frequencies = [frequencies; autocorrelate(audioFile[:,i],S)];
+            println(autocorrelate(audioFile[:,i],S))
         end
     end
 

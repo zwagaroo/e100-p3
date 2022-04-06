@@ -3,6 +3,8 @@ using FFTW;
 using Plots;
 
 waveform = (cos.(2pi*440/44100 * (1:(44100*3))));
+waveform = [waveform; (cos.(2pi*174/44100 * (1:(44100*3))))]
+waveform = [waveform; (cos.(2pi*240/44100 * (1:(44100÷2))))]
 #= waveform = waveform[1:2100] =#
 #= M = length(waveform)÷3
 hps = x[1:M] .* x[1:2:2M] .* x[1:3:3M];
@@ -22,3 +24,4 @@ big1[peak2end:end] .= false
 m = argmax(big1 .* autocorr)-1
 f= 44100/m =#
 
+transcribe(waveform, 44100)
