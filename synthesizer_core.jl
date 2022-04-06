@@ -143,13 +143,16 @@ function synthesize_period(f::Number, S::Number, current_length::Number, ht::har
     return periodWaveform, releaseVolume;
 end
 
-function synthesize_release(releaseVolume::Number, ht::harmonicTemplate, f::Number, S::Number, current_length::Number)
+function synthesize_release_period(releaseVolume::Number, release_current_length::Number, ht::harmonicTemplate, f::Number, S::Number, current_length::Number)
+    T = 1/f;
+    numPeriodSamples = round(Int, T*S);
     harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
+    print("hello")
     releaseSamples = ht.release*S;
-    releaseWaveform = vec(cos.(2π* (current_length+1:current_length+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
+    releaseWaveform = vec(cos.(2π* (current_length+1:current_length+numPeriodSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     releaseWaveform = releaseWaveform / maximum(abs, releaseWaveform)
     for i in range(1,size(releaseWaveform, 1))
-        releaseWaveform[i] = releaseWaveform[i] * releaseVolume * (1.0- i/releaseSamples);
+        releaseWaveform[i] = releaseWaveform[i] * releaseVolume * (1.0 - (i+release_current_length)/releaseSamples);
     end
     return releaseWaveform;
 end

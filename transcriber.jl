@@ -11,11 +11,12 @@ using LinearAlgebra:dot
 
     
 end=#
-file = "victors_msu.wav"
-(x,S,_,_) = wavread(file)
+
+#= file = "victors_msu.wav"
+(x,S,_,_) = wavread(file) =#
 
 
-#not a function, but returns total note length 
+#= #not a function, but returns total note length 
 N1 = 8192 
 y=mod(x,N1)
 a1 = reshape(y, N1, :) 
@@ -23,7 +24,7 @@ b1 = a1[end-99:end,:]
 c1 = sum(abs, b1, dims=1)
 e1 = findall(==(0), vec(c1))
 f1 = [0; e1[1:end-1]]
-
+ =#
 
 
 
@@ -71,4 +72,84 @@ f1 = [0; e1[1:end-1]]
 end
 
 print(phone_tone_transcriber(x, 8192))=#
+
+#this function finds the fundamental frequency of a small quasi periodic waveform
+function autocorrelate(waveform, S::Number)
+    autocorr = real(ifft(abs2.(fft([waveform; zeros(length(waveform))])))) / sum(abs2, waveform);
+    peak2start = nothing;
+    checker = .96;
+    peaks = [];
+    while(peak2start === nothing)
+        checker = checker - .01;
+        peaks = autocorr .> checker;
+        peaks[1:findfirst(==(false), peaks)] .= false;
+        #check if there is any true
+        peak2start = findfirst(==(true), peaks);
+    end
+    peak2end = findnext(==(false), peaks, peak2start);
+    peaks[peak2end:end] .= false;
+    #= m = argmax(peaks .* autocorr)-1; =# 
+#=     peaks = peaks.*autocorr; =#
+#=     #evaluate average value of m
+    discreteIntegral = 0;
+    m = 0;
+    for i in range(peak2start,peak2end-1)
+        discreteIntegral += peaks[i];
+        m += peaks[i] * i;
+    end
+    m /= discreteIntegral;
+    m -= 1; =#
+    m = ((peak2start + peak2end -1) /2) -1;
+    return S/m;
+end
+
+#outputs a list of tuples [(freq, length) .... ]
+#assume for now that length is constantly 44100 samples, eventually we will split into even smaller segments
+
+#this function groups anything within 50 cents to one frequency 
+#at the average of of all frequencies that are within 50 cents.
+function frequency_grouper(frequencies) 
+    noteList = []; 
+    current_frequency = frequencies[1];
+    current_counter = 0;
+    for i in range(1, size(frequencies,1))
+        if ((frequencies[i] < current_frequency*2^(1/24)) && (frequencies[i] > current_frequency*2^(-1/24)))
+            current_counter += 1;
+        else
+            print("ya")
+            note = (current_frequency, current_counter);
+            push!(noteList, note);
+            current_counter = 0;
+            current_frequency = frequencies[i];
+        end
+    end
+    note = (current_frequency, current_counter);
+    push!(noteList, note);
+    return noteList;
+end
+
+#we will say everything is the same note if it's within 50 cents
+function transcribe(audioFile, S::Number)
+    #for now look at segments of 1 second
+    #need to solve the problem of the sample space smaller than the sample sample_rate,
+    #can I guess add a series of zeros for reshape to keep all of the segments the same length
+    segmentLength = round(Int, 3000);
+    requiredAdditionalLength = (segmentLength - (length(audioFile) % segmentLength)) % segmentLength;
+    audioFile = [audioFile; zeros(requiredAdditionalLength)];
+    #now we can reshape without fail
+    audioFile = reshape(audioFile, segmentLength, :)
+    frequencies = [];
+    for i in range(1,size(audioFile, 2))
+        #assumes the last segment of 3000 samples is the same as the one before
+        #will work in most cases
+        if (i == size(audioFile,2))
+            frequencies = [frequencies; frequencies[end]];
+        else
+            frequencies = [frequencies; autocorrelate(audioFile[:,i],S)];
+        end
+    end
+
+    return frequency_grouper(frequencies)
+end
+
 
