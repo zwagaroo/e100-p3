@@ -32,5 +32,5 @@ while release_current_length < releaseSamples
     release = synthesize_release_period(releaseVolume, release_current_length, ht, 440, S, current_length);
     current_length = current_length + round(Int, (1/440) *S);
     release_current_length += round(Int, (1/440) *S);
-    write(stream, release)
+    write(stream, release);
 end
