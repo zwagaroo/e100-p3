@@ -1,9 +1,10 @@
 using Peaks;
 using FFTW;
 using Plots;
+include("transcriber.jl")
 
 waveform = (cos.(2pi*440/44100 * (1:(44100*3))));
-waveform = [waveform; (0cos.(2pi*174/44100 * (1:(32413))))]
+waveform = [waveform; (1cos.(2pi*174/44100 * (1:(32413))))]
 waveform = [waveform; (cos.(2pi*3423/44100 * (1:(5492))))]
 waveform = [waveform; (cos.(2pi*1500/44100 * (1:(44100÷2))))]
 waveform = [waveform; (cos.(2pi*1000/44100 * (1:(44100÷8))))]

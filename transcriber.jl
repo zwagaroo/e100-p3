@@ -54,6 +54,27 @@ function autocorrelate(waveform, S::Number)
     return S/m;
 end
 
+#finds the next valid frequencies inside a list of frequencies with specific resolution and
+#segment list, from a specific index
+function findNextFrequency(frequencies,resolution, segmentLength, index)
+    current_frequency = frequencies[index];
+    initial_frequency = frequencies[index];
+    current_count = 0;
+    for i in range(index, size(frequencies,1))
+        if(frequencies[i] <= current_frequency*(2^(1/24)) && frequencies[i] >= current_frequency*(2^(-1/24)))
+            current_count+=1;
+        else
+            #this is a new note and it's not the initial frequency
+            if(current_count*resolution > segmentLength && (current_frequency != initial_frequency))
+                return current_frequency;
+            end
+            current_frequency = frequencies[i];
+            current_count = 1;
+        end
+    end
+end
+
+
 #if it's less than segment length we can call bs,
 #because we expect notes to be longer than segmentLength
 #this does stop us from resoluting any note below 3000 samples
@@ -72,10 +93,11 @@ function smoother(frequencies, resolution, segmentLength)
             else #this note is bs
                 # all the things we looked at must just be the previous frequency actually,
                 #can later implement half goes to the previous_frequency and half goes to new frequency at
-                #frequencies[i]
+                #frequencies[i], not easily done because sometimes you don't know if the new frequency
+                #is actually a good frequency, it's hard to determine next frequency, or it's possible you have
+                #multiple spikes in a row which can insert a bunch of the next frequency
                 frequencies[(i-current_note_length):(i-1)] .= previous_frequency;
-                println("current length: ", current_note_length);
-                println("bounds: ", (i-current_note_length), ":",(i-1));
+
             end
             current_frequency = frequencies[i];
             current_note_length = 1;
@@ -92,12 +114,6 @@ function envelopeFollow(waveform)
     return avgAmplitude;
 end
 
-function envelopeNoteDet(envelope)
-
-end
-
-
-
 #outputs a list of tuples [(freq, length) .... ]
 #assume for now that length is constantly 44100 samples, eventually we will split into even smaller segments
 
@@ -112,15 +128,15 @@ function frequency_grouper(frequencies, resolution, segmentLength)
     current_counter = 0;
     first = true;
     for i in range(1, size(frequencies,1))
-        if ((frequencies[i] < current_frequency*2^(1/24)) && (frequencies[i] > current_frequency*2^(-1/24))|| (current_frequency == 0 && frequencies[i] == 0))
+        if ((frequencies[i] < current_frequency*2^(1/24)) && (frequencies[i] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i] == 0))
             current_counter += 1;
         else
-            first = false;
             if first
-                note = (current_frequency, segmentLength + (current_counter-1) *resolution);
+                note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
             else
                 note = (current_frequency, (current_counter) *resolution);
             end
+            first = false;
             push!(noteList, note);
             current_counter = 1;
             current_frequency = frequencies[i];
@@ -128,10 +144,11 @@ function frequency_grouper(frequencies, resolution, segmentLength)
 
     end
     #push final note out
-    note =  note = (current_frequency,segmentLength + (current_counter-1) *resolution);
+    note = (current_frequency,(segmentLength÷2) + (current_counter-1) *resolution);
     push!(noteList, note);
     return noteList;
 end
+
 
 function envelopeCrossThreshold(envelopeNormalized, threshold)
     envelopeAboveThreshold = envelopeNormalized .> threshold;
@@ -151,7 +168,7 @@ end
 #correction to the smoother results based on envelope crossing envelopeAboveThreshold
 #threshold as new notes.
 function smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution, segmentLength)
-    #looping through all the small segments of increment
+    #looping through all the small segments of increment, envelop and frequencies should be same size.
     for i in range(1, size(frequencies,1))
         #note begins here
         if(envelopeCrossAboveThreshold[i] == true)
@@ -161,7 +178,8 @@ function smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution,
             current_frequency = frequencies[i];
             #assume do nothing
             #check in the next segmentLength (which is segmentLength÷resolution ticks
-            #in frequencies)
+            #in frequencies) clearly if the frequency has been smoothed it's not gonna
+            #everything is 
             freq =  frequencies[(i+(segmentLength÷resolution))];
             #if freq is 50 cents away from current freq or that the current freq is 0 (rest)
             #and freq is not current freq any more then clearly we have changed frequency

@@ -156,3 +156,28 @@ function synthesize_release_period(releaseVolume::Number, release_current_length
     end
     return releaseWaveform;
 end
+
+#synthesize wrapper, generates whole entire song
+#takes a total gain
+function synthesize(notes, S::Number, ht::harmonicTemplate)
+    totalWaveform = [];
+    releaseQueue = zeros(round(Int,ht.release*S));
+    for i in range(1,size(notes,1))
+        #looping across all notes
+        newWaveform, newRelease = synthesize(notes[i][1], S, notes[i][2], ht);
+        #add any old release to newWaveform
+        #eventually it will start adding zeros if newWaveform is bigger than the release stored
+        for j in range(1,size(newWaveform))
+            #get the first from the releaseQueue
+            #then delete the first and add a zero to the end
+            #a problem here is that it's possible for it to be clipped
+            newWaveform[j] += releaseQueue[1];
+            popfirst!(releaseQueue);
+            push!(releaseQueue, 0)
+        end
+        #put new release on the old release.
+        releaseQueue += newRelease
+        append!(totalWaveform,newWaveform)
+    end
+    return totalWaveform;
+end
