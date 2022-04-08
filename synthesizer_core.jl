@@ -167,17 +167,18 @@ function synthesize(notes, S::Number, ht::harmonicTemplate)
         newWaveform, newRelease = synthesize(notes[i][1], S, notes[i][2], ht);
         #add any old release to newWaveform
         #eventually it will start adding zeros if newWaveform is bigger than the release stored
-        for j in range(1,size(newWaveform))
+        for j in range(1,size(newWaveform,1))
             #get the first from the releaseQueue
             #then delete the first and add a zero to the end
             #a problem here is that it's possible for it to be clipped
             newWaveform[j] += releaseQueue[1];
             popfirst!(releaseQueue);
-            push!(releaseQueue, 0)
+            push!(releaseQueue, 0);
         end
         #put new release on the old release.
-        releaseQueue += newRelease
-        append!(totalWaveform,newWaveform)
+        releaseQueue += newRelease;
+        append!(totalWaveform,newWaveform);
     end
+    append!(totalWaveform,releaseQueue);
     return totalWaveform;
 end
