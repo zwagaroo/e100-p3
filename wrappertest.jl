@@ -15,7 +15,8 @@ S = 44100
 notes = [(frequency("C",4),S*1),(frequency("C",4),S*1),(frequency("G",4),S*1),(frequency("G",4),S*1),(frequency("A",4),S*1),(frequency("A",4),S*1),(frequency("G",4),S*1)]
 
 a = synthesize(notes, 44100, ht)
+a ./= maximum(a)
 b = transcribe(a, 44100);
-println(b)
-soundsc(a,44100)
-
+#= println(b)
+write(out_stream, a)
+ =#

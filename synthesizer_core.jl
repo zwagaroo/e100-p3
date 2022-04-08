@@ -180,5 +180,5 @@ function synthesize(notes, S::Number, ht::harmonicTemplate)
         append!(totalWaveform,newWaveform);
     end
     append!(totalWaveform,releaseQueue);
-    return totalWaveform;
+    return convert(Vector{Float64},totalWaveform);
 end
