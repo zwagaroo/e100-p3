@@ -204,7 +204,7 @@ function transcribe(audioFile, S::Number)
     #can I guess add a series of zeros for reshape to keep all of the segments the same length
 
     #use sliding window
-    segmentLength = round(Int, 3000);
+    segmentLength = round(Int, 3500);
     threshold = .5;
     frequencies = [];
     envelope = [];
