@@ -7,7 +7,7 @@ S = 44100
 out_stream = PortAudioStream(0, 2; samplerate=Float64(S))
 
 
-synthesizedWaveForm ,sy releaseWaveform = synthesize(440, 44100, 4*44100, ht);
+synthesizedWaveForm, releaseWaveform = synthesize(440, 44100, 4*44100, ht);
 
 waveform = [synthesizedWaveForm; releaseWaveform];
 
