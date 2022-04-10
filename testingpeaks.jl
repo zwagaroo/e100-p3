@@ -2,8 +2,14 @@ using Peaks;
 using FFTW;
 using Plots;
 include("transcriber.jl")
+include("synthesizer_core.jl")
+using Sound
 
-waveform = [waveform; (cos.(2pi*2000/44100 * (1:(44100÷2))))]
+htDict = readHarmonicTemplates("harmonicTemplates.txt");
+ht = htDict["Saw16"];
+
+
+waveform =  (0cos.(2pi*2000/44100 * (1:(44100÷2))))
 #= waveform = waveform[1:2100] =#
 #= M = length(waveform)÷3
 hps = x[1:M] .* x[1:2:2M] .* x[1:3:3M];
@@ -24,4 +30,6 @@ m = argmax(big1 .* autocorr)-1
 f= 44100/m =#
 
 a = transcribe(waveform, 44100)
-
+println(a)
+b = synthesize(a, 44100, ht)
+soundsc(b, 44100)

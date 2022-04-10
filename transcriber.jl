@@ -120,15 +120,31 @@ end
 #this function groups anything within 50 cents to one frequency 
 #at the average of of all frequencies that are within 50 cents.
 #don't know if I assigned the correct number of samples for the grouper to each
-function frequency_grouper(frequencies, resolution, segmentLength) 
-    println(frequencies);
-    println(size(frequencies,1));
+function frequency_grouper(frequencies, resolution, segmentLength, envelopeCrossAboveThreshold) 
     noteList = []; 
     current_frequency = frequencies[1];
     current_counter = 0;
     first = true;
+    firstNoteInFrequency = true;
+    #we will do enevelope to detect repeated notes
+    #thus the first note according to the envelope will
+    #not be counted as it's already counted by the frequency change
     for i in range(1, size(frequencies,1))
         if ((frequencies[i] < current_frequency*2^(1/24)) && (frequencies[i] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i] == 0))
+            if(envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == true)
+                firstNoteInFrequency = false;
+            elseif (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == false)
+                #this is a new note
+                if first
+                    note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
+                else
+                    note = (current_frequency, (current_counter) *resolution);
+                end
+                first = false;
+                push!(noteList, note);
+                current_counter = 1;
+                continue;
+            end
             current_counter += 1;
         else
             if first
@@ -140,6 +156,7 @@ function frequency_grouper(frequencies, resolution, segmentLength)
             push!(noteList, note);
             current_counter = 1;
             current_frequency = frequencies[i];
+            firstNoteInFrequency = true;
         end
 
     end
@@ -220,7 +237,7 @@ function transcribe(audioFile, S::Number)
     envelopeCrossAboveThreshold = envelopeCrossThreshold(envelopeNormalized, threshold);
     frequencies = smoother(frequencies, resolution, segmentLength);
     frequencies = smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution, segmentLength);
-    return frequency_grouper(frequencies, resolution,segmentLength);
+    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold);
 end
 
 
