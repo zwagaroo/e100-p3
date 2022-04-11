@@ -75,15 +75,15 @@ function synthesize(f::Number, S::Number, N::Number, ht::harmonicTemplate)
     decaySamples = ht.decay*S;
     sustain = ht.sustain;
     releaseSamples = ht.release*S;
-    harmonicFreqs::Vector{Number} = f* range(1,16);
-    synthesizedWaveform = cos.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
+    harmonicFreqs::Vector{Number} = collect(f* (1:16));
+    synthesizedWaveform = sin.(2π * (1:N) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
     synthesizedWaveform = synthesizedWaveform .- sum(synthesizedWaveform)/N;
 #=     @show extrema(synthesizedWaveform);
     @show typeof(synthesizedWaveform)
     plot(synthesizedWaveform)
     gui()
     throw("hello") =#
-    releaseWaveform = cos.(2π* (N+1:N+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
+    releaseWaveform = sin.(2π* (N+1:N+releaseSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes;
     #envelope generator downhere
     peakVolume = 1; #default
     sustainVolume = peakVolume * 10^(sustain);
@@ -179,8 +179,11 @@ function synthesize(notes, S::Number, ht::harmonicTemplate)
         releaseQueue += newRelease;
         append!(totalWaveform,newWaveform);
     end
+    p1 = plot(releaseQueue);
+    p2 = plot(totalWaveform);
+    p3 = plot(p1,p2)
     append!(totalWaveform,releaseQueue);
     totalWaveform = convert(Vector{Float64},totalWaveform);
     totalWaveform = totalWaveform ./ maximum(totalWaveform);
-    return totalWaveform;
+    return totalWaveform, p3;
 end

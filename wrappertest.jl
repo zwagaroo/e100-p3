@@ -12,11 +12,12 @@ waveform = (cos.(2pi*440/44100 * (1:(44100*3))));
 waveform = [waveform; (cos.(2pi*880/44100 * (1:(44100*3))))]
 S = 44100
 
-notes = [(frequency("C",4),S*1),(frequency("C",4),S*1),(frequency("G",4),S*1),(frequency("G",4),S*1),(frequency("A",4),S*1),(frequency("A",4),S*1),(frequency("G",4),S*1)]
+notes = [(frequency("C",4),S*1),(frequency("rest"),S),(frequency("C",4),S*1),(frequency("G",4),S*1),(frequency("G",4),S*1),(frequency("A",4),S*1),(frequency("A",4),S*1),(frequency("G",4),S*1)]
 
-x = synthesize(notes, 44100, ht)
-x ./= maximum(x)
-y = transcribe(a, 44100);
-#= println(b)
-write(out_stream, a)
- =#
+x,_ = synthesize(notes, 44100, ht)
+y,e = transcribe(x, 44100);
+z,a = synthesize(y, 44100, ht)
+#=  =#
+#= write(out_stream, z) =#
+
+

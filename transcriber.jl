@@ -122,6 +122,7 @@ end
 #don't know if I assigned the correct number of samples for the grouper to each
 function frequency_grouper(frequencies, resolution, segmentLength, envelopeCrossAboveThreshold) 
     noteList = []; 
+    #the first frequency
     current_frequency = frequencies[1];
     current_counter = 0;
     first = true;
@@ -131,7 +132,8 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
     #not be counted as it's already counted by the frequency change
     for i in range(1, size(frequencies,1))
         if ((frequencies[i] < current_frequency*2^(1/24)) && (frequencies[i] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i] == 0))
-            if(envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == true)
+            if (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == true)
+                println("cross above threshold the first time at ", i, " for frequency ", frequencies[i])
                 firstNoteInFrequency = false;
             elseif (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == false)
                 #this is a new note
@@ -142,7 +144,7 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
                 end
                 first = false;
                 push!(noteList, note);
-                current_counter = 1;
+                current_counter = 0;
                 continue;
             end
             current_counter += 1;
@@ -157,8 +159,16 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
             current_counter = 1;
             current_frequency = frequencies[i];
             firstNoteInFrequency = true;
+            #if our envelope crossed above threshold at the frequency change
+            if(envelopeCrossAboveThreshold[i]== true && firstNoteInFrequency == true)
+                println("cross above threshold the first time at ", i, " for frequency ", frequencies[i])
+                firstNoteInFrequency = false;
+            end
+            println("reset at ", i, " for frequency ", frequencies[i])
         end
-
+#=         if(envelopeCrossAboveThreshold[i] == true)
+            println(firstNoteInFrequency);
+        end =#
     end
     #push final note out
     note = (current_frequency,(segmentLength÷2) + (current_counter-1) *resolution);
@@ -237,7 +247,7 @@ function transcribe(audioFile, S::Number)
     envelopeCrossAboveThreshold = envelopeCrossThreshold(envelopeNormalized, threshold);
     frequencies = smoother(frequencies, resolution, segmentLength);
     frequencies = smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution, segmentLength);
-    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold);
+    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold), envelopeCrossAboveThreshold;
 end
 
 

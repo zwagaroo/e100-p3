@@ -21,3 +21,9 @@ function frequency(noteName, octave)
     return  midi_to_frequency[note_name_to_midi[noteName] + octave*12];
     
 end
+
+function frequency(rest)
+    if(rest == "rest")
+        return 0
+    end
+end
