@@ -179,11 +179,8 @@ function synthesize(notes, S::Number, ht::harmonicTemplate)
         releaseQueue += newRelease;
         append!(totalWaveform,newWaveform);
     end
-    p1 = plot(releaseQueue);
-    p2 = plot(totalWaveform);
-    p3 = plot(p1,p2)
     append!(totalWaveform,releaseQueue);
     totalWaveform = convert(Vector{Float64},totalWaveform);
     totalWaveform = totalWaveform ./ maximum(totalWaveform);
-    return totalWaveform, p3;
+    return totalWaveform;
 end

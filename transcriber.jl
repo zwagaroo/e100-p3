@@ -88,7 +88,9 @@ function smoother(frequencies, resolution, segmentLength)
             current_note_length+=1;
         else
             #this is a new note
-            if(current_note_length*resolution > segmentLength)
+            #give a reasonable bit of doubt due to possible larger releases
+            if(current_note_length*resolution > 5500)
+                println("note of ", frequencies[i-1], " is a new note of ", current_note_length)
                 previous_frequency = current_frequency;
             else #this note is bs
                 # all the things we looked at must just be the previous frequency actually,
@@ -97,7 +99,6 @@ function smoother(frequencies, resolution, segmentLength)
                 #is actually a good frequency, it's hard to determine next frequency, or it's possible you have
                 #multiple spikes in a row which can insert a bunch of the next frequency
                 frequencies[(i-current_note_length):(i-1)] .= previous_frequency;
-
             end
             current_frequency = frequencies[i];
             current_note_length = 1;
@@ -130,22 +131,62 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
     #we will do enevelope to detect repeated notes
     #thus the first note according to the envelope will
     #not be counted as it's already counted by the frequency change
+    #will loop for each frequncy trying to detect the size of each frequency and group them
     for i in range(1, size(frequencies,1))
+        #if within 50 cents or if it's still zero if current_frequency is zero 
         if ((frequencies[i] < current_frequency*2^(1/24)) && (frequencies[i] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i] == 0))
+            #if then envelope has crossed above the threshold but it's the first note in that frequency
             if (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == true)
                 println("cross above threshold the first time at ", i, " for frequency ", frequencies[i])
+                #then we say that it's not the first note in that frequency anymore
                 firstNoteInFrequency = false;
-            elseif (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == false)
-                #this is a new note
-                if first
-                    note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
-                else
-                    note = (current_frequency, (current_counter) *resolution);
+
+                #since we put segments of the second frequency in a transition into the first in our autocorrelate we must check if this
+                #envelope == true actually belongs to second frequency or note, if it does then everything from this point the the second
+                #should belong in the second because envelope signals note start
+                #but if so then the previous note ended and we need to reset it correctly
+                if (!((frequencies[i+(segmentLength÷resolution)] < current_frequency*2^(1/24)) && (frequencies[i+(segmentLength÷resolution)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(segmentLength÷resolution)] == 0)))
+                    frequencies[i:i+(segmentLength÷resolution)] .= frequencies[i+(segmentLength÷resolution)];
+                    if first
+                        note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
+                    else
+                        note = (current_frequency, (current_counter) *resolution);
+                    end
+                    first = false;
+                    push!(noteList, note);
+                    #this means that a new note begun with the new frequency
+                    current_frequency = frequencies[i];
+                    current_counter = 0; #will add one in the end anyway so start at zero
+                    #first note in frequency is still false because we just detected the envelope that signifies the first note in this frequency
                 end
-                first = false;
-                push!(noteList, note);
-                current_counter = 0;
-                continue;
+            #else it's not the firstNoteInFrequency
+            elseif (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == false)
+                #need to check if this cross actually belongs to the start of the next note
+                #need to end the current note and also set frequencies equal in the next note
+                if (!((frequencies[i+(segmentLength÷resolution)] < current_frequency*2^(1/24)) && (frequencies[i+(segmentLength÷resolution)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(segmentLength÷resolution)] == 0)))
+                    frequencies[i:i+(segmentLength÷resolution)] .= frequencies[i+(segmentLength÷resolution)];
+                    if first
+                        note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
+                    else
+                        note = (current_frequency, (current_counter) *resolution);
+                    end
+                    first = false;
+                    push!(noteList, note);
+                    #this means that a new note begun with the new frequency
+                    current_frequency = frequencies[i];
+                    current_counter = 0; #will add one in the end anyway so start at zero
+                    #first note in frequency is still false because we just detected the envelope that signifies the first note in this frequency
+                else
+                #this is a new note
+                    if first
+                        note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
+                    else
+                        note = (current_frequency, (current_counter) *resolution);
+                    end
+                    first = false;
+                    push!(noteList, note);
+                    current_counter = 0;
+                end
             end
             current_counter += 1;
         else
@@ -247,6 +288,9 @@ function transcribe(audioFile, S::Number)
     envelopeCrossAboveThreshold = envelopeCrossThreshold(envelopeNormalized, threshold);
     frequencies = smoother(frequencies, resolution, segmentLength);
     frequencies = smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution, segmentLength);
+    #smooth again
+    println("second round")
+    frequencies = smoother(frequencies, resolution, segmentLength);
     return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold), envelopeCrossAboveThreshold;
 end
 
