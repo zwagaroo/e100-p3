@@ -41,11 +41,11 @@ end
 
 function writeHarmonicTemplates(filePath::String, htDict::Dict{String, harmonicTemplate})
     #clear file
-    io = open("harmonicTemplates.txt", "w");
+    io = open(filePath, "w");
     write(io, "");
     close(io);
     #rewrite our harmonic templates
-    io = open("harmonicTemplates.txt", "a");
+    io = open(filePath, "a");
     for key in keys(htDict)
         htTemp = htDict[key];
         write(io, key, ",", string(htTemp.attack), ",", string(htTemp.decay), ",", string(htTemp.sustain), ",", string(htTemp.release), ",");

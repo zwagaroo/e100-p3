@@ -11,6 +11,12 @@ S = 44100
 stream = PortAudioStream(0, 2; samplerate=Float64(S)) 
 releaseSamples = round(Int, (ht.release)*S);
 
+c3 = frequency("C", 3);
+
+function synthesize_for_key(frequency)
+    
+end
+
 while current_length < 4*S
     global current_length
     global releaseVolume;

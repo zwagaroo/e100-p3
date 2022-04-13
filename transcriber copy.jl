@@ -146,8 +146,8 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
                 #envelope == true actually belongs to second frequency or note, if it does then everything from this point the the second
                 #should belong in the second because envelope signals note start
                 #but if so then the previous note ended and we need to reset it correctly
-                if (!((frequencies[i+(55)] < current_frequency*2^(1/24)) && (frequencies[i+(55)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(55)] == 0)))
-                    frequencies[i:i+(55)] .= frequencies[i+(55)];
+                if (!((frequencies[i+(segmentLength÷resolution)] < current_frequency*2^(1/24)) && (frequencies[i+(segmentLength÷resolution)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(segmentLength÷resolution)] == 0)))
+                    frequencies[i:i+(segmentLength÷resolution)] .= frequencies[i+(segmentLength÷resolution)];
                     if first
                         note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
                     else
@@ -164,8 +164,8 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
             elseif (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == false)
                 #need to check if this cross actually belongs to the start of the next note
                 #need to end the current note and also set frequencies equal in the next note
-                if (!((frequencies[i+(55)] < current_frequency*2^(1/24)) && (frequencies[i+(55)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(55)] == 0)))
-                    frequencies[i:i+(55)] .= frequencies[i+(55)];
+                if (!((frequencies[i+(segmentLength÷resolution)] < current_frequency*2^(1/24)) && (frequencies[i+(segmentLength÷resolution)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(segmentLength÷resolution)] == 0)))
+                    frequencies[i:i+(segmentLength÷resolution)] .= frequencies[i+(segmentLength÷resolution)];
                     if first
                         note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
                     else
@@ -265,15 +265,6 @@ function smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution,
     return frequencies;
 end
 
-function sma(data, amount)
-    #keep it as data for the first amount of samples
-    sma = data[1:amount];
-    for i in range(amount+1, size(data, 1))
-        newVal = sum(data[(i-amount):(i-1)])/amount 
-        sma = [sma; newVal];
-    end
-    return sma;
-end
 
 #we will say everything is the same note if it's within 50 cents
 function transcribe(audioFile, S::Number)
@@ -295,13 +286,13 @@ function transcribe(audioFile, S::Number)
 
     end
     envelopeNormalized = envelope/maximum(envelope);
-    envelopeCrossAboveThreshold = envelopeCrossThreshold(sma(envelopeNormalized,7), threshold);
+    envelopeCrossAboveThreshold = envelopeCrossThreshold(envelopeNormalized, threshold);
     frequencies = smoother(frequencies, resolution, segmentLength);
     frequencies = smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution, segmentLength);
     #smooth again
     println("second round")
     frequencies = smoother(frequencies, resolution, segmentLength);
-    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold);
+    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold), envelopeNormalized, envelopeCrossAboveThreshold;
 end
 
 
