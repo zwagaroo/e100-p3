@@ -19,7 +19,7 @@ function autocorrelate(waveform, S::Number)
     autocorr = real(ifft(abs2.(fft([waveform; zeros(length(waveform))])))) / sum(abs2, waveform);
     #autocorr mirrors
     autocorr[(length(autocorr)÷2+2):end] .= 0; 
-#=     return plot(autocorr, label = "") =#
+   #=  return plot(autocorr, label = "", legend=:bottomleft) =#
     peak2start = nothing;
     checker = .96;
     peaks = [];
@@ -146,7 +146,7 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
                 #envelope == true actually belongs to second frequency or note, if it does then everything from this point the the second
                 #should belong in the second because envelope signals note start
                 #but if so then the previous note ended and we need to reset it correctly
-                if (!((frequencies[i+(55)] < current_frequency*2^(1/24)) && (frequencies[i+(55)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(55)] == 0)))
+                if (!((frequencies[i+(55)] < current_frequency*2^(1/24)) && (frequencies[i+(55)] > current_frequency*2^(-1/24))) || (current_frequency == 0 && frequencies[i+(55)] != 0))
                     frequencies[i:i+(55)] .= frequencies[i+(55)];
                     if first
                         note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
@@ -164,7 +164,7 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
             elseif (envelopeCrossAboveThreshold[i] == true && firstNoteInFrequency == false)
                 #need to check if this cross actually belongs to the start of the next note
                 #need to end the current note and also set frequencies equal in the next note
-                if (!((frequencies[i+(55)] < current_frequency*2^(1/24)) && (frequencies[i+(55)] > current_frequency*2^(-1/24)) || (current_frequency == 0 && frequencies[i+(55)] == 0)))
+                if (!((frequencies[i+(55)] < current_frequency*2^(1/24)) && (frequencies[i+(55)] > current_frequency*2^(-1/24))) || (current_frequency == 0 && frequencies[i+(55)] != 0))
                     frequencies[i:i+(55)] .= frequencies[i+(55)];
                     if first
                         note = (current_frequency, (segmentLength÷2) + (current_counter-1) *resolution);
@@ -299,9 +299,10 @@ function transcribe(audioFile, S::Number)
     frequencies = smoother(frequencies, resolution, segmentLength);
     frequencies = smootherCorrector(frequencies, envelopeCrossAboveThreshold, resolution, segmentLength);
     #smooth again
-    println("second round")
     frequencies = smoother(frequencies, resolution, segmentLength);
-    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold);
+    frequencies = smoother(frequencies, resolution, segmentLength);
+    frequencies = smoother(frequencies, resolution, segmentLength);
+    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold), envelopeNormalized, envelopeCrossAboveThreshold;
 end
 
 

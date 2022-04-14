@@ -4,7 +4,6 @@ htDict = readHarmonicTemplates("harmonicTemplates.txt");
 ht = htDict["Saw16"];
 current_length = 0;
 releaseVolume = 0; 
-out_stream = PortAudioStream(0, 2)
 
 
 S = 44100
@@ -29,6 +28,9 @@ while current_length < 4*S
     #     break
     # end
 end
+#= release = synthesize_release(releaseVolume, ht, 440, S, current_length);
+write(stream, release) =#
+
 
 release_current_length = 0;
 while release_current_length < releaseSamples
@@ -40,3 +42,4 @@ while release_current_length < releaseSamples
     release_current_length += round(Int, (1/440) *S);
     write(stream, release);
 end
+
