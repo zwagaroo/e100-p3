@@ -202,6 +202,7 @@ function frequency_grouper(frequencies, resolution, segmentLength, envelopeCross
                     current_counter = 0; #will add one in the end anyway so start at zero
                     #first note in frequency is still false because we just detected the envelope that signifies the first note in this frequency
                 else
+                    println("happened2: ", i)
                     #this just has to be a new note with the same frequency as before.
                     #push the old note to the noteList
                     if first
@@ -262,7 +263,7 @@ end
 #we smooth with sma
 function sma(data, amount)
     #keep it as data for the first amount of samples
-    sma = data[1:amount];
+    sma = zeros(amount);
     for i in range(amount+1, size(data, 1))
         newVal = sum(data[(i-amount):(i-1)])/amount 
         sma = [sma; newVal];
@@ -302,7 +303,7 @@ function transcribe(audioFile, S::Number)
     #we will give a bit more of a window for tolerance
     segmentLength = round(Int, 3500);
     #set threshold for envelopes 
-    threshold = .5;
+    threshold = .6;
     #initalizes frequencies and envelope as emtpy vectors
     frequencies = [];
     envelope = [];
