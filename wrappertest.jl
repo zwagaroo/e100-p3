@@ -31,15 +31,6 @@ vline!(new_xticks[1], legend=:topright, label ="Maximum of Second Peak")
 keep_indices = findall(x -> all(x .≠ new_xticks[1]), old_xticks[1])
 merged_xticks = (old_xticks[1][keep_indices] ∪ new_xticks[1], old_xticks[2][keep_indices] ∪ new_xticks[2])
 xticks!(merged_xticks) =#
-y,eN,eT = transcribe(waveform, S);
+y = transcribe(waveform, S);
 z = synthesize(y, S, ht); 
 write(out_stream, z)
-
-<<<<<<< HEAD
-y = transcribe(waveform, S);
-z = synthesize(y, S, ht);
- write(out_stream, z)
-#=  =#
-=======
->>>>>>> e140b643d395bced5cf596b4ad074198f82705f0
-

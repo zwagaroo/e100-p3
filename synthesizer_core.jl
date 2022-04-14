@@ -131,7 +131,7 @@ function synthesize_period(f::Number, S::Number, current_length::Number, ht::har
     for i in range(1, size(periodWaveform,1))
         if(current_length+i <= attackSamples) #within the range of attack portion
             periodWaveform[i] = periodWaveform[i] * ((i+current_length)/attackSamples)*peakVolume;
-            releaseVolume = (i/attackSamples)*peakVolume;
+            releaseVolume = ((i+current_length)/attackSamples)*peakVolume;
         elseif((current_length+i) > attackSamples && (current_length+i) <= attackSamples+decaySamples)
             periodWaveform[i] = periodWaveform[i] * peakVolume * 10^(sustain/10*((i+current_length)-attackSamples)/decaySamples);
             releaseVolume = peakVolume * 10^(sustain/10*((i+current_length)-attackSamples)/decaySamples);

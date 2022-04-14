@@ -326,7 +326,7 @@ function transcribe(audioFile, S::Number)
     frequencies = smoother(frequencies, resolution);
     frequencies = smoother(frequencies, resolution);
     #group
-    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold), envelopeNormalized, envelopeCrossAboveThreshold;
+    return frequency_grouper(frequencies, resolution,segmentLength, envelopeCrossAboveThreshold);
 end
 
 
