@@ -189,6 +189,7 @@ end
 
 id_fin = signal_connect(fin_key, "clicked") do widget
     print("FIN")
+    writeHarmonicTemplates("harmonicTemplates.txt", htDict)
     exit()
 end
 
