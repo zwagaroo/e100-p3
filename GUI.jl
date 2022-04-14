@@ -150,21 +150,13 @@ function synth_gui(note::String)
     ht = curr_ht
     current_length = 0;
     releaseVolume = 0; 
-<<<<<<< HEAD
     freq = frequency(note, octave)
-=======
-    out_stream = PortAudioStream(0, 2)
->>>>>>> e140b643d395bced5cf596b4ad074198f82705f0
     
     S = 44100
     stream = PortAudioStream(0, 2; samplerate=Float64(S)) 
     releaseSamples = round(Int, (ht.release)*S);
     
-<<<<<<< HEAD
     while current_length < S * Float64(note_duration/1000.0)
-=======
-    while current_length < S #one second note each
->>>>>>> e140b643d395bced5cf596b4ad074198f82705f0
         global releaseVolume;
         global release;
         periodWaveform, releaseVolume = synthesize_period(freq,S, current_length, ht);
@@ -197,47 +189,13 @@ end
 
 id_fin = signal_connect(fin_key, "clicked") do widget
     print("FIN")
-<<<<<<< HEAD
     exit()
-=======
->>>>>>> e140b643d395bced5cf596b4ad074198f82705f0
 end
 
 id_c = signal_connect(key1, "clicked") do widget
     print("C")
-<<<<<<< HEAD
     
     synth_gui("C")
-=======
- #=    c_pressed = true; #this is global or something
-    current_length = 0;
-    releaseVolume = 0; 
-    out_stream = PortAudioStream(0, 2)
-    S = 44100
-    stream = PortAudioStream(0, 2; samplerate=Float64(S)) 
-    releaseSamples = round(Int, (ht.release)*S);
-    while(c_pressed):
-        global releaseVolume;
-        global release;
-        periodWaveform, releaseVolume = synthesize_period(freq,S, current_length, ht);
-        current_length = current_length + round(Int, (1/freq)*S) 
-        write(stream, periodWaveform)
-        if(c_released)
-            break;
-        end
-    end
-
-    release_current_length = 0;
-    while release_current_length < releaseSamples
-        ##global current_length;
-        global releaseVolume;
-        release = synthesize_release_period(releaseVolume, release_current_length, ht, freq, S, current_length);
-        current_length = current_length + round(Int, (1/freq) *S);
-        release_current_length += round(Int, (1/freq) *S);
-        write(stream, release);
-    end =#
-    synth_gui(262)
->>>>>>> e140b643d395bced5cf596b4ad074198f82705f0
 end
 
 id_d = signal_connect(key2, "clicked") do widget
