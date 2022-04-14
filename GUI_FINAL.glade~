@@ -3,17 +3,17 @@
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkAdjustment" id="adjustment_A">
-    <property name="upper">0.01</property>
+    <property name="upper">10</property>
     <property name="step-increment">0.01</property>
     <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment_D">
-    <property name="upper">100</property>
+    <property name="upper">10</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="adjustment_R">
-    <property name="upper">100</property>
+    <property name="upper">10</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
@@ -22,30 +22,27 @@
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkListStore" id="list_store_instruments">
-    <columns>
-      <!-- column-name gchararray1 -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">Saxophone</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Accordion</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">Yo Mamma</col>
-      </row>
-    </data>
+  <object class="GtkAdjustment" id="adjustment_length">
+    <property name="upper">3000</property>
+    <property name="value">1</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment_octave">
+    <property name="lower">1</property>
+    <property name="upper">7</property>
+    <property name="value">4</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkWindow" id="window">
     <property name="width-request">-1</property>
     <property name="height-request">-1</property>
     <property name="can-focus">False</property>
-    <property name="title" translatable="yes">SynthCord</property>
+    <property name="title" translatable="yes">SynthChord</property>
     <property name="default-width">1028</property>
     <property name="default-height">578</property>
+    <property name="icon-name">audio-x-generic</property>
     <child>
       <object class="GtkFixed" id="fixed_1">
         <property name="visible">True</property>
@@ -477,7 +474,7 @@
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">FIN.</property>
+                <property name="label" translatable="yes">Exit</property>
                 <attributes>
                   <attribute name="font-desc" value="Gotham Medium, Medium 18"/>
                 </attributes>
@@ -485,8 +482,8 @@
             </child>
           </object>
           <packing>
-            <property name="x">81</property>
-            <property name="y">463</property>
+            <property name="x">900</property>
+            <property name="y">20</property>
           </packing>
         </child>
         <child>
@@ -509,21 +506,8 @@
             <property name="can-focus">True</property>
           </object>
           <packing>
-            <property name="x">690</property>
-            <property name="y">115</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel">
-            <property name="width-request">76</property>
-            <property name="height-request">20</property>
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="label" translatable="yes">Read from file:</property>
-          </object>
-          <packing>
-            <property name="x">690</property>
-            <property name="y">40</property>
+            <property name="x">600</property>
+            <property name="y">100</property>
           </packing>
         </child>
         <child>
@@ -538,8 +522,8 @@
             </attributes>
           </object>
           <packing>
-            <property name="x">690</property>
-            <property name="y">95</property>
+            <property name="x">600</property>
+            <property name="y">80</property>
           </packing>
         </child>
         <child>
@@ -591,7 +575,7 @@
             </child>
           </object>
           <packing>
-            <property name="x">692</property>
+            <property name="x">602</property>
             <property name="y">160</property>
           </packing>
         </child>
@@ -605,40 +589,7 @@
           </object>
           <packing>
             <property name="x">30</property>
-            <property name="y">255</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBox" id="instrument_chooser">
-            <property name="width-request">203</property>
-            <property name="height-request">34</property>
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="model">list_store_instruments</property>
-            <property name="has-entry">True</property>
-            <property name="entry-text-column">0</property>
-            <child internal-child="entry">
-              <object class="GtkEntry">
-                <property name="can-focus">False</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="x">30</property>
-            <property name="y">275</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkImage" id="ADSR_graph">
-            <property name="width-request">250</property>
-            <property name="height-request">200</property>
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="pixbuf">sample_Plan de travail 1.png</property>
-          </object>
-          <packing>
-            <property name="x">12</property>
-            <property name="y">35</property>
+            <property name="y">175</property>
           </packing>
         </child>
         <child>
@@ -647,15 +598,16 @@
             <property name="height-request">20</property>
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="label" translatable="yes">Custom:</property>
+            <property name="label" translatable="yes">Custom</property>
             <attributes>
               <attribute name="weight" value="heavy"/>
               <attribute name="scale" value="1.8"/>
+              <attribute name="underline" value="True"/>
             </attributes>
           </object>
           <packing>
-            <property name="x">15</property>
-            <property name="y">8</property>
+            <property name="x">550</property>
+            <property name="y">30</property>
           </packing>
         </child>
         <child>
@@ -667,25 +619,7 @@
             <property name="can-focus">False</property>
             <child>
               <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-top">10</property>
-                <property name="label" translatable="yes">A:</property>
-                <attributes>
-                  <attribute name="font-desc" value="Gotham Medium, Medium 20"/>
-                  <attribute name="weight" value="ultrabold"/>
-                  <attribute name="scale" value="1.5"/>
-                  <attribute name="foreground" value="#9999c1c1f1f1"/>
-                  <attribute name="background" value="#35358484e4e4"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
+                <property name="width-request">30</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="margin-top">10</property>
@@ -704,6 +638,7 @@
             </child>
             <child>
               <object class="GtkLabel">
+                <property name="width-request">30</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="margin-top">10</property>
@@ -790,22 +725,29 @@
                 <property name="top-attach">3</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="width-request">30</property>
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-top">10</property>
+                <property name="label" translatable="yes">A:</property>
+                <attributes>
+                  <attribute name="weight" value="ultrabold"/>
+                  <attribute name="scale" value="1.5"/>
+                  <attribute name="foreground" value="#9999c1c1f1f1"/>
+                  <attribute name="background" value="#1c1c7171d8d8"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="x">290</property>
             <property name="y">35</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFileChooserButton" id="file_chooser_1">
-            <property name="width-request">135</property>
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="title" translatable="yes"/>
-          </object>
-          <packing>
-            <property name="x">775</property>
-            <property name="y">33</property>
           </packing>
         </child>
         <child>
@@ -817,23 +759,162 @@
             <property name="pixbuf">logo.png</property>
           </object>
           <packing>
-            <property name="x">531</property>
-            <property name="y">66</property>
+            <property name="x">25</property>
+            <property name="y">25</property>
           </packing>
         </child>
         <child>
-          <object class="GtkSearchEntry">
+          <object class="GtkEntry" id="load_entry">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+          </object>
+          <packing>
+            <property name="x">70</property>
+            <property name="y">470</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="load_button">
+            <property name="label" translatable="yes">Load</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+          </object>
+          <packing>
+            <property name="x">120</property>
+            <property name="y">510</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Load From</property>
+            <attributes>
+              <attribute name="weight" value="medium"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="x">120</property>
+            <property name="y">450</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSpinButton" id="octave_spin">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="adjustment">adjustment_octave</property>
+          </object>
+          <packing>
+            <property name="x">800</property>
+            <property name="y">300</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Octave:</property>
+          </object>
+          <packing>
+            <property name="x">800</property>
+            <property name="y">285</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="instrument_chooser">
+            <property name="width-request">200</property>
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="x">30</property>
+            <property name="y">195</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Note duration (ms):</property>
+          </object>
+          <packing>
+            <property name="x">800</property>
+            <property name="y">365</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="rest_button">
             <property name="width-request">100</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">7</property>
+                <property name="spacing">1</property>
+                <property name="homogeneous">True</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Rest</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="pixbuf">zzz.png</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">85</property>
+            <property name="y">315</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="reset_button">
+            <property name="label" translatable="yes">Reset Notes</property>
+            <property name="width-request">140</property>
+            <property name="height-request">40</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+          </object>
+          <packing>
+            <property name="x">620</property>
+            <property name="y">520</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScale" id="length_slider">
+            <property name="width-request">225</property>
             <property name="height-request">80</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="primary-icon-name">edit-find-symbolic</property>
-            <property name="primary-icon-activatable">False</property>
-            <property name="primary-icon-sensitive">False</property>
+            <property name="adjustment">adjustment_length</property>
+            <property name="round-digits">1</property>
+            <property name="value-pos">right</property>
           </object>
           <packing>
-            <property name="x">10</property>
-            <property name="y">123</property>
+            <property name="x">800</property>
+            <property name="y">350</property>
           </packing>
         </child>
       </object>

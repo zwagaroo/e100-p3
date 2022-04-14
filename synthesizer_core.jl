@@ -147,7 +147,6 @@ function synthesize_release_period(releaseVolume::Number, release_current_length
     T = 1/f;
     numPeriodSamples = round(Int, T*S);
     harmonicFreqs::Vector{Number} = [f*i for i in range(1,16)];
-    print("hello")
     releaseSamples = ht.release*S;
     releaseWaveform = vec(cos.(2π* (current_length+1:current_length+numPeriodSamples) * harmonicFreqs'/S) * ht.harmonicAmplitudes);
     releaseWaveform = releaseWaveform / maximum(abs, releaseWaveform)

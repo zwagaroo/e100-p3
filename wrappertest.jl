@@ -26,6 +26,6 @@ ylabel!("Correlation") =#
 
 y = transcribe(waveform, S);
 z = synthesize(y, S, ht);
-#= write(out_stream, z) =#
+ write(out_stream, z)
 #=  =#
 
