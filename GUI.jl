@@ -43,7 +43,7 @@ key6 = b["key6"]
 key7 = b["key7"]
 fin_key = b["fin_button"]
 play_key = b["play"]
-pause_key = b["pause"]
+#pause_key = b["pause"]
 save_amplitude = b["save_amplitude"]
 clear_amplitude = b["clear_amplitude"]
 delete_amplitude = b["delete_amplitude"]
@@ -125,8 +125,8 @@ push!(GAccessor.style_context(fin_key), GtkStyleProvider(key), 600)
 set_gtk_property!(fin_key, :name, "kb")
 push!(GAccessor.style_context(play_key), GtkStyleProvider(key), 600)
 set_gtk_property!(play_key, :name, "kb")
-push!(GAccessor.style_context(pause_key), GtkStyleProvider(key), 600)
-set_gtk_property!(pause_key, :name, "kb")
+#push!(GAccessor.style_context(pause_key), GtkStyleProvider(key), 600)
+#set_gtk_property!(pause_key, :name, "kb")
 push!(GAccessor.style_context(save_amplitude), GtkStyleProvider(key), 600)
 set_gtk_property!(save_amplitude, :name, "kb")
 push!(GAccessor.style_context(clear_amplitude), GtkStyleProvider(key), 600)
@@ -304,9 +304,12 @@ id_play = signal_connect(play_key, "clicked") do widget
     write(out_stream, z)
 end
 
+#=
 id_pause = signal_connect(pause_key, "clicked") do widget
     print("pause")
+    close(out_stream)
 end
+=#
 
 id_spin_octave = signal_connect(octave_spin, "value-changed") do widget
     octave_num = GAccessor.value(octave_spin)

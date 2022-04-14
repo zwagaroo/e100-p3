@@ -171,7 +171,7 @@ end
 #synthesize wrapper, generates whole entire song
 #takes a total gain
 function synthesize(notes, S::Number, ht::harmonicTemplate)
-    totalWaveform = [];
+    totalWaveform = Vector{Float64}([]);
     releaseQueue = zeros(round(Int,ht.release*S));
     for i in range(1,size(notes,1))
         #looping across all notes

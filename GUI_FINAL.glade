@@ -373,7 +373,7 @@
         </child>
         <child>
           <object class="GtkButton" id="play">
-            <property name="width-request">60</property>
+            <property name="width-request">140</property>
             <property name="height-request">60</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
@@ -388,7 +388,7 @@
             </child>
           </object>
           <packing>
-            <property name="x">700</property>
+            <property name="x">620</property>
             <property name="y">450</property>
           </packing>
         </child>
@@ -400,27 +400,6 @@
           </object>
           <packing>
             <property name="x">848</property>
-            <property name="y">450</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="pause">
-            <property name="width-request">60</property>
-            <property name="height-request">60</property>
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="pixel-size">40</property>
-                <property name="icon-name">media-playback-stop-symbolic.symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="x">620</property>
             <property name="y">450</property>
           </packing>
         </child>
