@@ -7,7 +7,7 @@ out_stream = PortAudioStream(0, 2);
 
 
 htDict = readHarmonicTemplates("harmonicTemplates.txt");
-ht = htDict["Saw16"];
+ht = htDict["Triangle16"];
 waveform, S = wavread("twinkle.wav");
 waveform .= waveform ./maximum(waveform) 
 #= write(out_stream, waveform) =#
