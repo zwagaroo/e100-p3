@@ -133,9 +133,11 @@
             <property name="margin-bottom">10</property>
             <child>
               <object class="GtkSpinButton" id="1">
+                <property name="width-request">125</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_1</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -147,6 +149,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_2</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -158,6 +161,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_3</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -169,6 +173,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_4</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -180,6 +185,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_5</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -191,6 +197,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_6</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -202,6 +209,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_7</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -213,6 +221,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_8</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -221,9 +230,11 @@
             </child>
             <child>
               <object class="GtkSpinButton" id="9">
+                <property name="width-request">125</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_9</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -235,6 +246,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_10</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -246,6 +258,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_11</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -257,6 +270,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_12</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -268,6 +282,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_13</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -279,6 +294,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_14</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -290,6 +306,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_15</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -301,6 +318,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="adjustment">a_16</property>
+                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left-attach">1</property>
