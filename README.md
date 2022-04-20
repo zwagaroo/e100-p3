@@ -40,6 +40,7 @@ SynthChord allows you to create custom instrument harmonic templates using this 
 
 To adjust Attack, Decay, Sustain, and Release, simply adjust the corresponding ADSR sliders
 ![App Screenshot](https://i.imgur.com/Ao20vjM.png)
+
 Then, press the 'Enter 16 Amplitudes' button and enter the 16 values into the pop-up window's entries.
 
 To save a harmonic template, press the save button below the 'Enter 16 Amplitudes' button and enter the instrument name
