@@ -11,12 +11,6 @@ ht = htDict["Saw16"];
 
 waveform =  (0cos.(2pi*2000/44100 * (1:(44100÷2))))
 #= waveform = waveform[1:2100] =#
-#= M = length(waveform)÷3
-hps = x[1:M] .* x[1:2:2M] .* x[1:3:3M];
-hps ./= maximum(hps);
-
-plot(hps)
-x = real(ifft(hps)) =#
 #= autocorrelate(waveform, 44100) =#
 
 #= autocorr = real(ifft(abs2.(fft([waveform; zeros(length(waveform))])))) / sum(abs2, waveform);
