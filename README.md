@@ -66,5 +66,5 @@ The instrument should now appear in the instrument selection drop-down menu
 
 #
 
-![Logo](https://i.imgur.com/E7O4xnv.png)
+![Logo](https://i.imgur.com/17RsASY.png)
 
