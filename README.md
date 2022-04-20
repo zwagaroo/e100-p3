@@ -21,8 +21,10 @@ To listen to your song, press the play button near the bottom right of the keybo
 ### Music Conversion From File
 To load a .wav file for conversion, you must first copy your desired file into the SynthChord project folder
 
-Press the 'Load from file' button at the bottom left of the window, and enter the full filename of the file you wish to convert into the pop-up window and press confirm.
+Press the 'Load from file' button at the bottom left of the window, and enter the filename of the file you wish to convert into the pop-up window.
+
 ![App Screenshot](https://i.imgur.com/Xw594Ny.png)
+
 Select your desired instrument from the dropdown menu and press play to listen to your converted song
 
 ### Saving Songs
