@@ -47,6 +47,20 @@ To save a harmonic template, press the save button below the 'Enter 16 Amplitude
 
 The instrument should now appear in the instrument selection drop-down menu
 
+## Tests
+
+We have a variety of testing files within the project.
+
+snr_test.jl: Performs the SNR test on our transcriber.
+
+sythesizer_multiplenotes.jl: Performs envelope tests for multiple notes
+
+synthesizer_transcriber_wrapper_test.jl: Performs the timbre and envelope alteration. To change the file transcribed to another, just enter the name of the file in the waveread.
+
+synthesizer_waveform_tests.jl: Generates the waveform A440. The FFT portion is commented out uncomment it to see the FFT of our synthesized waveform.
+
+transcriber_limit_tests.jl: performed basic and limit tests on our transcriber, including waveforms with rests. You can add more to the waveform generated to keep on testing the transcriber.
+
 
 
 

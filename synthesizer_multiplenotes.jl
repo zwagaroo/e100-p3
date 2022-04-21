@@ -18,8 +18,7 @@ waveform = synthesize(notes,44100, ht)
 #= soundsc(waveform, 44100) =#
 
 y = waveform / maximum(abs, waveform)
-plot(y, label = "", title = "Generated Waveform of Multple Notes", xlabel = "Samples", ylabel = "Amplitude")
-plot(abs.(fft(y)))
+plot(y, label = "", title = "Generated Waveform of Multiple Notes", xlabel = "Samples", ylabel = "Amplitude")
 #= write(out_stream, y) =#
 
 

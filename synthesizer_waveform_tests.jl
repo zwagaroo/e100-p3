@@ -4,7 +4,6 @@ using FFTW
 using Sound;
 using PortAudio;
 using Plots;
-plotly();
 htDict = readHarmonicTemplates("harmonicTemplates.txt")
 ht = htDict["Saw16"]
 S = 44100
@@ -21,7 +20,7 @@ waveform = synthesize(notes,44100, ht)
 #= soundsc(waveform, 44100) =#
 
 y = waveform / maximum(abs, waveform)
-plot(y, label = "", title = "Generated Waveform of Multple Notes", xlabel = "Samples", ylabel = "Amplitude")
+plot(y, label = "", title = "Generated Waveform of A440", xlabel = "Samples", ylabel = "Amplitude")
 #= FFT = 2/size(waveform,1) *abs.(fft(y));
 freqs = (((1:(length(FFT)))) .-1) .* S/length(FFT);
 p1 = plot(freqs[1:10000], FFT[1:10000],label = "", title = "FFT of A440 Saw16", xlabel = "Frequencies (Hz)", ylabel = "Amplitude")
